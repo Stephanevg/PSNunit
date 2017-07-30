@@ -10,13 +10,10 @@ Class TestResults {
     [TestStats]$TestStats
     hidden [String]$RawResults
 
-    #New Classwhere-object
-
     TestResults([System.IO.FileInfo]$TestDocument) {
         $this.RawResults = Get-Content $TestDocument.FullName
 
         [xml]$x = $this.RawResults
-        #Parsing XML
 
         $Tres = (select-xml -Xml $x -XPath "test-results").Node
         $this.Name = $Tres.Name
@@ -35,7 +32,7 @@ Class TestResults {
 
         $TestReslts = (select-xml -Xml $x -XPath "/test-results/test-suite").Node
         $this.TestResults = [TestSuite]::New($TestReslts)
-        #$this.TestSuite = $TestSuite
+
         $AllTestSuites = (select-xml -Xml $x -XPath "/test-results/test-suite").Node.Results.'test-suite'
         
         foreach ($t in $AllTestSuites) {
@@ -46,7 +43,6 @@ Class TestResults {
 
         #I know this is ugly, but until I find a smarter way to add this information in TestStats class, I'll have to leave here.
         
-        #$this.Stats.total = $Tres.total
         $this.TestStats.errors = $Tres.errors
         $this.TestStats.TotalTestCases = $Tres.total
         $this.TestStats.TotalTestCaseFailures = $Tres.failures
@@ -244,20 +240,20 @@ Class TestStats {
 
     [TestSuiteStats[]]$TestSuiteStats
 
-    TestStats([TestResults]$TestResults){
+    TestStats([TestResults]$TestResults) {
         $this.Name = $TestResults.Name
-        $this.TotalTime = [Math]::Round($TestResults.TestResults.Time,2)
+        $this.TotalTime = [Math]::Round($TestResults.TestResults.Time, 2)
         $this.SuccessFullTestSuites = $TestResults.TestResults.Success
         $this.TotalTestSuites = $TestResults.TestSuite.count
         #$this.TotalTestCases = $TestResults.TestResults.total
         $this.FailedTestSuites = ($TestResults.TestSuite | where-object {$_.Result -eq 'Failure'}).Count
         $this.SuccessFullTestSuites = ($TestResults.TestSuite | where-object {$_.Result -eq 'Success'}).Count
-        $this.percentageSuccess =  [Math]::Round((100 * $this.SuccessFullTestSuites)/$this.TotalTestSuites,2)
-        $this.percentageFailed =  [Math]::round((100 * $this.FailedTestSuites)/$this.TotalTestSuites,2)
+        $this.percentageSuccess = [Math]::Round((100 * $this.SuccessFullTestSuites) / $this.TotalTestSuites, 2)
+        $this.percentageFailed = [Math]::round((100 * $this.FailedTestSuites) / $this.TotalTestSuites, 2)
         
         $this.Name
 
-        foreach ($ts in $TestResults.TestSuite){
+        foreach ($ts in $TestResults.TestSuite) {
             $this.TestSuiteStats += [TestSuiteStats]::New($ts)
         }
         
@@ -266,11 +262,11 @@ Class TestStats {
 
     
 
-    [TestCase[]]GetFailedTestCases([TestSuite]$TestSuite){
+    [TestCase[]]GetFailedTestCases([TestSuite]$TestSuite) {
         return $TestSuite.Results | where-object {$_.Result -eq [Result]::Failure}
     }
 
-    [TestCase[]]GetSuccessfullTestCases([TestSuite]$TestSuite){
+    [TestCase[]]GetSuccessfullTestCases([TestSuite]$TestSuite) {
         return $TestSuite.Results | where-object {$_.Result -eq [Result]::Succes}
     }
 
@@ -290,14 +286,29 @@ Class TestSuiteStats {
     [TestCase[]]$FailedTestCases
     [TestCase[]]$SuccessfullTestCases
 
-    TestSuiteStats([TestSuite]$TestSuite){
+    TestSuiteStats([TestSuite]$TestSuite) {
         $This.Name = $TestSuite.Name
         $this.TotalTestCases = $TestSuite.Results.count
         $this.Failed = ($TestSuite.Results | where-object {$_.Result -eq 'Failure'}).Count
         $this.Success = ($TestSuite.Results | where-object {$_.Result -eq 'Success'}).Count
         $this.Time = $TestSuite.Time
-        $this.percentageSuccess =  [Math]::Round((100 * $this.Success)/$this.TotalTestCases,2)
-        $this.percentageFailed =  [Math]::round((100 * $this.Failed)/$this.TotalTestCases,2)
+
+        #Avoid a division by zero error
+        if ($this.TotalTestCases -eq 0) {
+            $this.percentageSuccess = 0
+        }
+        else {
+            $this.percentageSuccess = [Math]::Round((100 * $this.Success) / $this.TotalTestCases, 2)
+        }
+        
+        if ($this.TotalTestCases -eq 0) {
+            $this.percentageFailed = 0
+        }
+        else {
+            $this.percentageFailed = [Math]::round((100 * $this.Failed) / $this.TotalTestCases, 2)
+        }
+
+        
         $This.FailedTestCases = ($TestSuite.Results | where-object {$_.Result -eq 'Failure'})
         $This.SuccessfullTestCases = ($TestSuite.Results | where-object {$_.Result -eq 'Success'})
     }
@@ -305,22 +316,3 @@ Class TestSuiteStats {
 
 
 }
-
-
-# $TestCases = @()
-# for ($i = 0; $i -le 25; $i++) {
-#     $TestCases += [TestCase]::new("Test$($i)", "Description n° $($i)", 2.43, 0, $true, "Success", $true)
-# }
-
-# $Suite = [TestSuite]::New("Standard Compliancy Tests", "TestFixture", 12.3456 , 2, $false, "Failure", $True, [TestCase[]]$TestCases)
-# #$Suite
-
-#$item = Get-Item "C:\Users\taavast3\OneDrive\Scripting\Repository\Unclassified\_builds\Pester\NTOSDPP102_CompliancyReport_20170221-173357.xml"
-
-#$myts = [TestResults]::New($item)
-
-
-#$SuiteStats = [TestSuiteStats]::New($myts.TestSuite[0])
-
-#$SuiteStats
-
