@@ -1,3 +1,3 @@
 using module ".\PoshNunitXML.psm1"
 
-write-verbose "imported module poshNunitXML"
+write-host "imported module poshNunitXML" -ForegroundColor Cyan
