@@ -9,10 +9,10 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = '.\PoshNunitXML.psm1'
+RootModule = 'PoshNunitXML.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.1'
+ModuleVersion = '0.2.0'
 
 # ID used to uniquely identify this module
 GUID = '88172686-a6cd-4722-9d8a-0c4e5176e9e2'
@@ -54,7 +54,7 @@ Copyright = '(c) 2017 Stephane van Gulick. All rights reserved.'
 # RequiredAssemblies = @()
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
- ScriptsToProcess = @(".\init.ps1")
+ #ScriptsToProcess = @(".\init.ps1")
 
 # Type files (.ps1xml) to be loaded when importing this module
 # TypesToProcess = @()
@@ -92,7 +92,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        #Tags = @()
 
         # A URL to the license for this module.
         # LicenseUri = ''

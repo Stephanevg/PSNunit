@@ -1,0 +1,5 @@
+
+Enum Result{
+    Success
+    Failure
+}
