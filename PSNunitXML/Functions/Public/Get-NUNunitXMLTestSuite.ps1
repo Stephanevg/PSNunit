@@ -1,5 +1,5 @@
 
-function Get-NunitXMLTestSuite {
+function Get-NUNunitXMLTestSuite {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]

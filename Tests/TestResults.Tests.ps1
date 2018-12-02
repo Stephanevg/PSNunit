@@ -11,9 +11,6 @@ import-module $module
 
 
 
-$item = Get-Item "C:\Users\taavast3\OneDrive\Scripting\Repository\Modules\PoshNunitXML\NTOSIMPD116_CompliancyReport_20170222-092429.xml"
-
-$myts = [TestResults]::New($item)
 $item = get-item "C:\Users\taavast3\OneDrive\Scripting\Repository\Modules\PoshNunitXML\Tests\pickles.xml"
 $myts = [TestResults]::New($item)
 
