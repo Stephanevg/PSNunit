@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="6" errors="0" failures="2" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2018-12-02" time="22:06:20">
+  <environment user="TAAVAST3" machine-name="U279610" cwd="C:\Users\taavast3\OneDrive\Repo\Projects\OpenSource\Demos" user-domain="CORPROOT" platform="Microsoft Windows 10 Enterprise|C:\Windows|\Device\Harddisk0\Partition4" nunit-version="2.5.8.0" os-version="10.0.16299" clr-version="4.0.30319.42000" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="1.8817" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="C:\Users\taavast3\OneDrive\Repo\Projects\OpenSource\Demos\Introduction To Pester\Examples\Demo06.ps1" executed="True" result="Failure" success="False" time="1.2617" asserts="0" description="C:\Users\taavast3\OneDrive\Repo\Projects\OpenSource\Demos\Introduction To Pester\Examples\Demo06.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Testing New-StagingEntry" executed="True" result="Failure" success="False" time="1.09" asserts="0" description="Testing New-StagingEntry">
+            <results>
+              <test-case description="[Parameterless] Should not throw" name="Testing New-StagingEntry.[Parameterless] Should not throw" time="0.714" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>Expected no exception to be thrown, but an exception "The term 'Get-ADComputer' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again." was thrown from C:\Users\taavast3\OneDrive\Repo\Projects\OpenSource\Demos\Introduction To Pester\Examples\Demo06.ps1:29 char:10
+    +         {New-StagingEntry} | should not throw
+    +          ~~~~~~~~~~~~~~~~.</message>
+                  <stack-trace>at &lt;ScriptBlock&gt;, C:\Users\taavast3\OneDrive\Repo\Projects\OpenSource\Demos\Introduction To Pester\Examples\Demo06.ps1: line 29
+29:         {New-StagingEntry} | should not throw</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="[Parameterless] Should return 'Staging-Computername'" name="Testing New-StagingEntry.[Parameterless] Should return 'Staging-Computername'" time="0.376" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>The term 'Get-ADComputer' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.</message>
+                  <stack-trace>at &lt;ScriptBlock&gt;, C:\Users\taavast3\OneDrive\Repo\Projects\OpenSource\Demos\Introduction To Pester\Examples\Demo06.ps1: line 33
+33:         $d = New-StagingEntry
+</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Testing New-StagingEntry with mocking" executed="True" result="Success" success="True" time="0.1717" asserts="0" description="Testing New-StagingEntry with mocking">
+            <results>
+              <test-case description="[Parameterless] Should not throw" name="Testing New-StagingEntry with mocking.[Parameterless] Should not throw" time="0.1317" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="[Parameterless] Should return 'Staging-Computername'" name="Testing New-StagingEntry with mocking.[Parameterless] Should return 'Staging-Computername'" time="0.04" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\taavast3\OneDrive\Repo\Projects\OpenSource\Demos\Introduction To Pester\Examples\Demo05.ps1" executed="True" result="Success" success="True" time="0.62" asserts="0" description="C:\Users\taavast3\OneDrive\Repo\Projects\OpenSource\Demos\Introduction To Pester\Examples\Demo05.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Testing Export-BiosData" executed="True" result="Success" success="True" time="0.62" asserts="0" description="Testing Export-BiosData">
+            <results>
+              <test-case description="[Format:csv]Should export data to csv file" name="Testing Export-BiosData.[Format:csv]Should export data to csv file" time="0.5428" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="[Format:Json]Should export data to Json file" name="Testing Export-BiosData.[Format:Json]Should export data to Json file" time="0.0772" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

@@ -11,7 +11,7 @@ import-module $module
 
 
 
-$item = get-item "C:\Users\taavast3\OneDrive\Scripting\Repository\Modules\PoshNunitXML\Tests\pickles.xml"
+$item = get-item ".\pickles.xml"
 $myts = [TestResults]::New($item)
 
 $SuiteStats = [TestSuiteStats]::New($myts.TestSuite[0])

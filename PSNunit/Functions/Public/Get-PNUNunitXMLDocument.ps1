@@ -2,7 +2,8 @@ Function Get-PNUNunitXMLDocument{
     [CmdletBinding()]
     Param(
 
-    $Path
+    [Parameter(Mandatory=$true)]
+    [String]$Path
 
     )
 
