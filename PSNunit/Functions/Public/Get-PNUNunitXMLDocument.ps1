@@ -1,4 +1,4 @@
-Function Get-NunitXMLDocument{
+Function Get-PNUNunitXMLDocument{
     [CmdletBinding()]
     Param(
 
