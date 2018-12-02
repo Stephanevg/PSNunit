@@ -12,7 +12,7 @@
 RootModule = 'PSNunit.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2.0'
+ModuleVersion = '0.2.1'
 
 # ID used to uniquely identify this module
 GUID = '88172686-a6cd-4722-9d8a-0c4e5176e9e2'
