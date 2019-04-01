@@ -1,5 +1,0 @@
-
-Enum Result{
-    Success
-    Failure
-}

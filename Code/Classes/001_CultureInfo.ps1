@@ -1,4 +1,10 @@
 
+
+Enum Result{
+    Success
+    Failure
+}
+
 Class CultureInfo {
     [String]$CurrentCulture
     [String]$CurrentUICulture

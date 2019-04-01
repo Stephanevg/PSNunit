@@ -1,10 +1,5 @@
-﻿#Generated at 04/01/2019 17:19:52 by Stephane van Gulick
-
-
-Enum Result{
-    Success
-    Failure
-}
+#Nunit 3.0 XML Schema
+    #https://github.com/nunit/docs/wiki/Test-Result-XML-Format
 
 Class CultureInfo {
     [String]$CurrentCulture
@@ -20,6 +15,7 @@ Class CultureInfo {
         $this.CurrentUICulture = $currentuiculture
     }
 }
+
 Class Failure {
     [string]$Message
     [string]$Stack
@@ -36,6 +32,7 @@ Class Failure {
 
 }
 
+
 Class TestCase {
     [String]$Name
     [String]$Description
@@ -45,6 +42,7 @@ Class TestCase {
     [Result]$Result
     [Bool]$Executed
     [Failure]$Failure
+    $Type
 
     TestCase([String]$Name, [String]$Description, [double]$Time, [int]$Asserts, [Bool]$Success, [Result]$Result, [Bool]$Executed) {
         $this.Name = $Name
@@ -54,6 +52,7 @@ Class TestCase {
         $This.Success = $Success
         $this.Result = $Result
         $This.Executed = $Executed
+        $this.Type = "TestCase"
     }
 
     TestCase([String]$Name, [String]$Description, [double]$Time, [int]$Asserts, [Bool]$Success, [Result]$Result, [Bool]$Executed, [Failure]$Failure) {
@@ -65,6 +64,7 @@ Class TestCase {
         $this.Result = $Result
         $This.Executed = $Executed
         $This.Failure = $Failure
+        $this.Type = "TestCase"
     }
 
     TestCase([system.xml.XmlElement]$XmlElement) {
@@ -75,7 +75,7 @@ Class TestCase {
         $This.Success = $XmlElement.success
         $this.Result = $XmlElement.result
         $This.Executed = $XmlElement.executed
-
+        $this.Type = "TestCase"
         if ($this.Success -eq "Failure") {
             $This.Failure = [failure]::New($XmlElement.failure)
         }
@@ -86,7 +86,14 @@ Class TestCase {
     }
 }
 
+<#
+#Test Suite can represent the following:
+    A complete set of tests: Type:'TestFixture' -> Description: contains 'Pester' then.
+    A file (Containing one or more tests) (It represents a .Tests.Ps1 file) Type:'TestFixture' Description: will contain the path to the file in that case
+    A test (Describe block) Type:'TestFixture' ->  Description: The value of -Name of the Describe.
+        This last one will contain one or more 'Test-Case' where 'description' contains the value of the 'name' parameter from the 'it'.
 
+#>
 Class TestSuite {
     [string] $Type
     [String] $Name
@@ -96,10 +103,10 @@ Class TestSuite {
     [Bool]$Success
     
     [int]$Asserts
-    [TestCase[]]$Results
+    $Results
     #[TestSuiteStats]$Stats
 
-    TestSuite([String]$Name, [String]$Type, [double]$Time, [int]$Asserts, [Bool]$Success, [Result]$Result, [Bool]$Executed, [TestCase[]]$Results) {
+    TestSuite([String]$Name, [String]$Type, [double]$Time, [int]$Asserts, [Bool]$Success, [Result]$Result, [Bool]$Executed, $Results) {
         $this.Name = $Name
         $This.Type = $Type
         $this.Time = $Time
@@ -121,56 +128,86 @@ Class TestSuite {
 
         $res = @()
         foreach ($tc in $XmlElement.Results.'test-case') {
-            #$d.results.'test-suite'.results.'test-suite'.results
+ 
             $Res += [TestCase]::New($tc)
+        }
+
+        foreach ($ts in $XmlElement.Results.'test-suite') {
+ 
+            $Res += [TestSuite]::New($ts)
         }
 
         $this.Results = $res
 
         #$this.Stats = [TestSuiteStats]::New($this)
     }
+
+
+
+    [testCase[]]GetFailedTestsCases(){
+        $ret = $this.Results | ? {$_.Type -eq "TestCase" -and $_.Result -eq "Failure"}
+        return $ret
+    }
+
+    [int] GetFailedTestCasesCount(){
+        return ($this.GetFailedTestsCases() | measure).Count
+    }
+
+    [testCase[]]GetSuccessTestsCases(){
+        $ret = $this.Results | ? {$_.Type -eq "TestCase" -and $_.Result -eq "Success"}
+        return $ret
+    }
+
+    [int] GetSuccessTestsCasesCount(){
+        return ($this.GetSuccessTestsCases() | measure).Count
+    }
+
+    [int] GetTotalTestsCasesCount(){
+        return ($this.GetSuccessTestsCases() + $this.GetFailedTestCasesCount())
+    }
 }
+
 Class TestSuiteStats {
     [String]$Name
+
+    
     [int]$Failed
     [int]$Success
     [double]$percentageSuccess
     [double]$percentageFailed
     [int]$Time
     [int]$TotalTestCases
-    [TestCase[]]$FailedTestCases
-    [TestCase[]]$SuccessfullTestCases
+    [int]$FailedTestCases
+    [int]$SuccessTestCases
 
     TestSuiteStats([TestSuite]$TestSuite) {
         $This.Name = $TestSuite.Name
-        $this.TotalTestCases = $TestSuite.Results.count
-        $this.Failed = ($TestSuite.Results | where-object {$_.Result -eq 'Failure'}).Count
-        $this.Success = ($TestSuite.Results | where-object {$_.Result -eq 'Success'}).Count
+        $this.TotalTestCases = $TestSuite.GetTotalTestsCasesCount()
+        $this.Failed = $TestSuite.GetFailedTestCasesCount()
+        $this.Success = $TestSuite.GetSuccessTestsCasesCount()
         $this.Time = $TestSuite.Time
 
         #Avoid a division by zero error
         if ($this.TotalTestCases -eq 0) {
             $this.percentageSuccess = 0
-        }
-        else {
+        } else {
             $this.percentageSuccess = [Math]::Round((100 * $this.Success) / $this.TotalTestCases, 2)
         }
         
         if ($this.TotalTestCases -eq 0) {
             $this.percentageFailed = 0
-        }
-        else {
+        }else {
             $this.percentageFailed = [Math]::round((100 * $this.Failed) / $this.TotalTestCases, 2)
         }
 
-        
-        $This.FailedTestCases = ($TestSuite.Results | where-object {$_.Result -eq 'Failure'})
-        $This.SuccessfullTestCases = ($TestSuite.Results | where-object {$_.Result -eq 'Success'})
+        $This.FailedTestCases = $TestSuite.GetFailedTestsCases()
+        $This.SuccessTestCases = $TestSuite.GetSuccessTestsCases()
     }
 
 
 
 }
+
 Class TestEnvironment {
 
     [string]$User
@@ -204,6 +241,7 @@ Class TestEnvironment {
         $this.CLRVersion = $clrversion
     }
 }
+
 Class TestStats {
     [string]$Name
     [int]$FailedTestSuites
@@ -321,91 +359,13 @@ Class NunitXMLDocument {
         $this.TestStats.Invalid = $Tres.Invalid
 
     }
-}
-Function Get-PNUnintTestCase {
-    <#
-    .SYNOPSIS
-        Get all the Test cases.
-    .DESCRIPTION
-        Will return all the test cases from a Document or a TestSuite.
-    .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
-    .INPUTS
-        Inputs (if any)
-    .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
-    #>
-    [CmdletBinding()]
-    param (
-        [Parameter(ParameterSetName='Document')]
-        [NunitXMLDocument]$Document, 
-        
-        [Parameter(ParameterSetName='TestSuite')]
-        [TestSuite[]]$TestSuite = @(),
 
-        [ValidateSet('Success','Failure','All')]
-        $Status = 'All'
-
-    )
-    
-    begin {
-    }
-    
-    process {
-        If($Document){
-
-            $TestSuite = @()
-            $TestSuite = Get-PNUNuniTestSuite -Document $Document 
-        }
-        Foreach($TestCase in $TestSuite){
-            If($Status -eq 'All'){
-
-                $TestCase.Results 
-            }Else{
-                $TestCase | ? {$_.Result -eq $Status}
-            }
-        }
-        
-    }
-    
-    end {
+    GetTestSuites(){
+        $this.TestResults
     }
 }
-Function Get-PNUNunitDocument{
-    [CmdletBinding()]
-    Param(
 
-    [Parameter(Mandatory=$true)]
-    [String]$Path
-
-    )
-
-
-    return [NunitXMLDocument]::New($Path)
-
-}
-
-function Get-PNUNuniTestSuite {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        [NunitXMLDocument]$Document
-    )
-    
-    begin {
-    }
-    
-    process {
-        foreach($doc in $Document){
-            
-            #REturning Test suite
-            $Doc.TestSuite
-        }
-    }
-    
-    end {
-    }
+Enum Result{
+    Success
+    Failure
 }
